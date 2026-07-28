@@ -256,9 +256,12 @@ When a refresh succeeds, RubyWeather writes a temporary file in the cache
 directory and atomically renames it over the prior entry. This preserves the
 last usable forecast if the process is interrupted during serialization.
 
-Malformed, unsupported-version, or incomplete entries are not considered
-fresh. If their forecast payload cannot be normalized safely, they are not
-eligible for stale fallback.
+Any cache-read failure is treated as a cache miss. This includes filesystem
+errors, invalid JSON, an unsupported schema version, missing fields, and a
+forecast payload that cannot be normalized safely. RubyWeather then performs a
+normal fetch and atomically replaces the entry. An unreadable or invalid entry
+is not eligible for stale fallback; if rebuilding also fails, the command exits
+with the fetch error.
 
 The lock covers freshness rechecking, refresh, and atomic replacement, so many
 concurrent ordinary invocations at a cache boundary still produce only one
@@ -366,6 +369,7 @@ Required coverage:
 - Expired and forced refreshes
 - Atomic cache replacement
 - Malformed and unsupported cache entries
+- Filesystem cache-read failures followed by cache rebuild
 - Refresh failure with stale fallback and age warning
 - Refresh failure without a usable fallback
 - Exact stdout/stderr separation and exit statuses
