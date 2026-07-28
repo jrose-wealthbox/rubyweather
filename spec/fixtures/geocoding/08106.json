@@ -1,0 +1,16 @@
+{
+  "results": [
+    {
+      "id": 4500546,
+      "name": "Audubon",
+      "latitude": 39.89095,
+      "longitude": -75.07295,
+      "elevation": 20.0,
+      "feature_code": "PPL",
+      "country_code": "US",
+      "admin1": "New Jersey",
+      "country": "United States",
+      "timezone": "America/New_York"
+    }
+  ]
+}
