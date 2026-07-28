@@ -10,7 +10,7 @@ RSpec.describe "RubyWeather::CacheStore" do
   let(:store) { store_class.new(root:) }
   let(:location) do
     RubyWeather::Location.new(
-      query: "08106",
+      query: "90210",
       name: "Audubon",
       admin1: "New Jersey",
       country: "United States",
@@ -31,9 +31,9 @@ RSpec.describe "RubyWeather::CacheStore" do
   after { FileUtils.rm_rf(root) }
 
   it "round trips a versioned entry and applies a strict 30-minute lifetime" do
-    store.write("08106", entry)
+    store.write("90210", entry)
 
-    loaded = store.read("08106")
+    loaded = store.read("90210")
     expect(loaded.location).to eq(location)
     expect(loaded.forecast_payload).to eq(entry.forecast_payload)
     expect(store.fresh?(loaded, now: entry.fetched_at + 1_800)).to be(true)
@@ -42,17 +42,17 @@ RSpec.describe "RubyWeather::CacheStore" do
 
   it "treats invalid JSON and unsupported schemas as cache misses" do
     FileUtils.mkdir_p(root)
-    File.write(store.path_for("08106"), "{broken")
-    expect(store.read("08106")).to be_nil
+    File.write(store.path_for("90210"), "{broken")
+    expect(store.read("90210")).to be_nil
 
-    File.write(store.path_for("08106"), JSON.generate("schema_version" => 999))
-    expect(store.read("08106")).to be_nil
+    File.write(store.path_for("90210"), JSON.generate("schema_version" => 999))
+    expect(store.read("90210")).to be_nil
   end
 
   it "treats filesystem read failures as cache misses" do
     allow(File).to receive(:read).and_raise(Errno::EACCES)
 
-    expect(store.read("08106")).to be_nil
+    expect(store.read("90210")).to be_nil
   end
 
   it "uses a digest rather than user input in cache paths" do
@@ -61,10 +61,10 @@ RSpec.describe "RubyWeather::CacheStore" do
   end
 
   it "leaves no temporary files after atomic replacement" do
-    store.write("08106", entry)
+    store.write("90210", entry)
 
     expect(Dir.children(root).grep(/\.tmp\z/)).to be_empty
-    expect(JSON.parse(File.read(store.path_for("08106"))).fetch("schema_version")).to eq(1)
+    expect(JSON.parse(File.read(store.path_for("90210"))).fetch("schema_version")).to eq(1)
   end
 
   it "serializes two processes refreshing the same location" do
@@ -75,7 +75,7 @@ RSpec.describe "RubyWeather::CacheStore" do
     first = fork do
       events_reader.close
       release_writer.close
-      cache_store.with_lock("08106") do
+      cache_store.with_lock("90210") do
         events_writer.puts("first-acquired")
         release_reader.gets
         events_writer.puts("first-released")
@@ -86,7 +86,7 @@ RSpec.describe "RubyWeather::CacheStore" do
     second = fork do
       events_reader.close
       release_reader.close
-      cache_store.with_lock("08106") { events_writer.puts("second-acquired") }
+      cache_store.with_lock("90210") { events_writer.puts("second-acquired") }
     end
 
     expect(events_reader.wait_readable(0.1)).to be_nil

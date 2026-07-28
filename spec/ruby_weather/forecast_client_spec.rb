@@ -5,7 +5,7 @@ RSpec.describe "RubyWeather::ForecastClient" do
   let(:transport) { instance_double("RubyWeather::HttpClient") }
   let(:location) do
     RubyWeather::Location.new(
-      query: "08106",
+      query: "90210",
       name: "Audubon",
       admin1: "New Jersey",
       country: "United States",
@@ -17,7 +17,7 @@ RSpec.describe "RubyWeather::ForecastClient" do
   end
 
   it "requests full Fahrenheit coverage and all presentation fields" do
-    allow(transport).to receive(:get).and_return(fixture("forecast/08106.json"))
+    allow(transport).to receive(:get).and_return(fixture("forecast/90210.json"))
 
     client_class.new(transport:).call(location)
 

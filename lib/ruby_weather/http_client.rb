@@ -24,8 +24,8 @@ module RubyWeather
     def connection_for(uri)
       Net::HTTP.new(uri.host, uri.port).tap do |http|
         http.use_ssl = uri.scheme == "https"
-        http.open_timeout = 5
-        http.read_timeout = 10
+        http.open_timeout = Constants::HTTP_OPEN_TIMEOUT_SECONDS
+        http.read_timeout = Constants::HTTP_READ_TIMEOUT_SECONDS
       end
     end
   end

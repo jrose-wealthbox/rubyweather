@@ -3,11 +3,11 @@
 ## Sample usage and output
 
 `rw` - name of script
-`08106` - location to use
+`90210` - location to use
 `5` - number of hours and days to list
 
 ```
-bundle exec rw 08106 5 --verbose --force-fetch
+bundle exec rw 90210 5 --verbose --force-fetch
 ```
 
 ```

@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe "RubyWeather::Forecast" do
   let(:forecast_class) { RubyWeather.const_get(:Forecast) }
-  let(:payload) { JSON.parse(fixture("forecast/08106.json")) }
+  let(:payload) { JSON.parse(fixture("forecast/90210.json")) }
   let(:now) { Time.utc(2026, 7, 28, 23, 24) }
 
   it "starts hours at the current local forecast hour" do

@@ -20,13 +20,13 @@ bundle install
 Run the repository-local executable:
 
 ```sh
-bundle exec exe/rw 08106
+bundle exec exe/rw 90210
 ```
 
 When installed as a gem, the executable is simply:
 
 ```sh
-rw 08106
+rw 90210
 ```
 
 ## Usage
@@ -38,9 +38,9 @@ rw LOCATION [--hours N] [--days N] [--verbose] [--force-fetch]
 Examples:
 
 ```sh
-bundle exec exe/rw 08106
+bundle exec exe/rw 90210
 bundle exec exe/rw "Springfield, IL" --hours 12 --days 7
-bundle exec exe/rw 08106 --verbose --force-fetch
+bundle exec exe/rw 90210 --verbose --force-fetch
 ```
 
 The defaults are five hours and five days. `LOCATION` may be a place name or

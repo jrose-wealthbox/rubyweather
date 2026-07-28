@@ -4,6 +4,19 @@ require "net/http"
 RSpec.describe "RubyWeather::HttpClient" do
   let(:client_class) { RubyWeather.const_get(:HttpClient) }
 
+  it "uses the shared HTTP timeout policy" do
+    response = instance_double(Net::HTTPSuccess, body: '{"ok":true}', code: "200")
+    http = instance_double(Net::HTTP)
+    allow(Net::HTTP).to receive(:new).and_return(http)
+    allow(http).to receive(:use_ssl=)
+    expect(http).to receive(:open_timeout=).with(RubyWeather::Constants::HTTP_OPEN_TIMEOUT_SECONDS)
+    expect(http).to receive(:read_timeout=).with(RubyWeather::Constants::HTTP_READ_TIMEOUT_SECONDS)
+    allow(http).to receive(:start).and_yield(http)
+    allow(http).to receive(:get).and_return(response)
+
+    client_class.new.get(URI("https://example.test/data"))
+  end
+
   it "returns the body for successful responses" do
     response = instance_double(Net::HTTPSuccess, body: '{"ok":true}', code: "200")
     http = instance_double(Net::HTTP)

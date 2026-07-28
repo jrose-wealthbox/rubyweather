@@ -43,8 +43,8 @@
 - `lib/ruby_weather/cli.rb`: options, orchestration, fallbacks, streams, and exit statuses.
 - `spec/spec_helper.rb`: deterministic RSpec configuration.
 - `spec/support/fixture_helper.rb`: checked-in JSON fixture loader.
-- `spec/fixtures/geocoding/08106.json`: representative top-match geocoding response.
-- `spec/fixtures/forecast/08106.json`: 16-day representative provider response.
+- `spec/fixtures/geocoding/90210.json`: representative top-match geocoding response.
+- `spec/fixtures/forecast/90210.json`: 16-day representative provider response.
 - `spec/**/*_spec.rb`: unit and integration coverage matching each responsibility.
 - `README.md`: installation, usage, caching, attribution, and examples.
 
@@ -78,10 +78,10 @@ require "spec_helper"
 RSpec.describe RubyWeather::CLI do
   describe ".parse" do
     it "uses the five-hour and five-day defaults" do
-      options = described_class.parse(["08106"])
+      options = described_class.parse(["90210"])
 
       expect(options.to_h).to eq(
-        location: "08106",
+        location: "90210",
         hours: 5,
         days: 5,
         verbose: false,
@@ -105,9 +105,9 @@ RSpec.describe RubyWeather::CLI do
 
     it "rejects missing locations, zero counts, and provider-overflow counts" do
       expect { described_class.parse([]) }.to raise_error(RubyWeather::UsageError)
-      expect { described_class.parse(["08106", "--hours", "0"]) }
+      expect { described_class.parse(["90210", "--hours", "0"]) }
         .to raise_error(RubyWeather::UsageError, /hours must be between 1 and 384/)
-      expect { described_class.parse(["08106", "--days", "17"]) }
+      expect { described_class.parse(["90210", "--days", "17"]) }
         .to raise_error(RubyWeather::UsageError, /days must be between 1 and 16/)
     end
 
@@ -267,7 +267,7 @@ git commit -m "Set up RubyWeather CLI package"
 - Create: `lib/ruby_weather/http_client.rb`
 - Create: `lib/ruby_weather/location.rb`
 - Create: `lib/ruby_weather/location_resolver.rb`
-- Create: `spec/fixtures/geocoding/08106.json`
+- Create: `spec/fixtures/geocoding/90210.json`
 - Create: `spec/support/fixture_helper.rb`
 - Create: `spec/ruby_weather/http_client_spec.rb`
 - Create: `spec/ruby_weather/location_resolver_spec.rb`
@@ -301,16 +301,16 @@ RSpec.describe RubyWeather::LocationResolver do
   subject(:resolver) { described_class.new(transport:) }
 
   it "selects the first geocoding result and preserves the query" do
-    allow(transport).to receive(:get).and_return(fixture("geocoding/08106.json"))
+    allow(transport).to receive(:get).and_return(fixture("geocoding/90210.json"))
 
-    location = resolver.call("08106")
+    location = resolver.call("90210")
 
     expect(location.display_name).to eq("Audubon, New Jersey, United States")
-    expect(location.query).to eq("08106")
+    expect(location.query).to eq("90210")
     expect(location.timezone).to eq("America/New_York")
     expect(transport).to have_received(:get) do |uri|
       expect(uri.host).to eq("geocoding-api.open-meteo.com")
-      expect(uri.query).to include("name=08106", "count=10")
+      expect(uri.query).to include("name=90210", "count=10")
     end
   end
 
@@ -323,7 +323,7 @@ RSpec.describe RubyWeather::LocationResolver do
 end
 ```
 
-Create `spec/fixtures/geocoding/08106.json` from a saved Open-Meteo response
+Create `spec/fixtures/geocoding/90210.json` from a saved Open-Meteo response
 whose first result contains `name`, `admin1`, `country`, `latitude`,
 `longitude`, `elevation`, and `timezone`.
 
@@ -467,7 +467,7 @@ git commit -m "Add Open-Meteo location resolution"
 **Files:**
 - Create: `lib/ruby_weather/forecast_client.rb`
 - Create: `lib/ruby_weather/forecast.rb`
-- Create: `spec/fixtures/forecast/08106.json`
+- Create: `spec/fixtures/forecast/90210.json`
 - Create: `spec/ruby_weather/forecast_client_spec.rb`
 - Create: `spec/ruby_weather/forecast_spec.rb`
 - Modify: `lib/ruby_weather.rb`
@@ -491,13 +491,13 @@ RSpec.describe RubyWeather::ForecastClient do
   let(:transport) { instance_double(RubyWeather::HttpClient) }
   let(:location) do
     RubyWeather::Location.new(
-      query: "08106", name: "Audubon", admin1: "New Jersey", country: "United States",
+      query: "90210", name: "Audubon", admin1: "New Jersey", country: "United States",
       latitude: 39.89, longitude: -75.07, elevation: 20.0, timezone: "America/New_York"
     )
   end
 
   it "requests full Fahrenheit coverage and all presentation fields" do
-    allow(transport).to receive(:get).and_return(fixture("forecast/08106.json"))
+    allow(transport).to receive(:get).and_return(fixture("forecast/90210.json"))
 
     described_class.new(transport:).call(location)
 
@@ -526,7 +526,7 @@ end
 require "spec_helper"
 
 RSpec.describe RubyWeather::Forecast do
-  let(:payload) { JSON.parse(fixture("forecast/08106.json")) }
+  let(:payload) { JSON.parse(fixture("forecast/90210.json")) }
   let(:now) { Time.utc(2026, 7, 28, 23, 24) } # 7:24 PM at UTC-4
 
   it "starts hours at the current local forecast hour" do
@@ -557,7 +557,7 @@ RSpec.describe RubyWeather::Forecast do
 end
 ```
 
-Create `spec/fixtures/forecast/08106.json` as a compact checked-in fixture with
+Create `spec/fixtures/forecast/90210.json` as a compact checked-in fixture with
 the exact fields above, `utc_offset_seconds: -14400`, hourly entries spanning
 the test's current hour and 1 PM, and matching daily entries.
 
@@ -783,7 +783,7 @@ RSpec.describe RubyWeather::CacheStore do
   let(:store) { described_class.new(root:) }
   let(:location) do
     RubyWeather::Location.new(
-      query: "08106", name: "Audubon", admin1: "New Jersey", country: "United States",
+      query: "90210", name: "Audubon", admin1: "New Jersey", country: "United States",
       latitude: 39.89, longitude: -75.07, elevation: 20.0, timezone: "America/New_York"
     )
   end
@@ -797,9 +797,9 @@ RSpec.describe RubyWeather::CacheStore do
   after { FileUtils.remove_entry(root) }
 
   it "round trips a versioned entry and applies a strict 30-minute lifetime" do
-    store.write("08106", entry)
+    store.write("90210", entry)
 
-    loaded = store.read("08106")
+    loaded = store.read("90210")
     expect(loaded.location).to eq(location)
     expect(store.fresh?(loaded, now: entry.fetched_at + 1_800)).to be true
     expect(store.fresh?(loaded, now: entry.fetched_at + 1_801)).to be false
@@ -807,22 +807,22 @@ RSpec.describe RubyWeather::CacheStore do
 
   it "treats invalid JSON and unsupported schemas as cache misses" do
     FileUtils.mkdir_p(root)
-    File.write(store.path_for("08106"), "{broken")
-    expect(store.read("08106")).to be_nil
+    File.write(store.path_for("90210"), "{broken")
+    expect(store.read("90210")).to be_nil
 
-    File.write(store.path_for("08106"), JSON.generate("schema_version" => 999))
-    expect(store.read("08106")).to be_nil
+    File.write(store.path_for("90210"), JSON.generate("schema_version" => 999))
+    expect(store.read("90210")).to be_nil
   end
 
   it "treats filesystem read failures as cache misses" do
     allow(File).to receive(:read).and_raise(Errno::EACCES)
-    expect(store.read("08106")).to be_nil
+    expect(store.read("90210")).to be_nil
   end
 
   it "leaves no temporary files after atomic replacement" do
-    store.write("08106", entry)
+    store.write("90210", entry)
     expect(Dir.children(root).grep(/tmp/)).to be_empty
-    expect(JSON.parse(File.read(store.path_for("08106"))).fetch("schema_version")).to eq(1)
+    expect(JSON.parse(File.read(store.path_for("90210"))).fetch("schema_version")).to eq(1)
   end
 end
 ```
@@ -927,7 +927,7 @@ it "serializes two processes refreshing the same location" do
   first = fork do
     events_reader.close
     release_writer.close
-    store.with_lock("08106") do
+    store.with_lock("90210") do
       events_writer.puts("first-acquired")
       release_reader.gets
       events_writer.puts("first-released")
@@ -938,7 +938,7 @@ it "serializes two processes refreshing the same location" do
   second = fork do
     events_reader.close
     release_reader.close
-    store.with_lock("08106") { events_writer.puts("second-acquired") }
+    store.with_lock("90210") { events_writer.puts("second-acquired") }
   end
 
   expect(IO.select([events_reader], nil, nil, 0.1)).to be_nil
@@ -1231,12 +1231,12 @@ RSpec.describe RubyWeather::CLI do
   end
 
   it "renders a fresh cache entry without network access" do
-    allow(cache).to receive(:read).with("08106").and_return(entry)
+    allow(cache).to receive(:read).with("90210").and_return(entry)
     allow(cache).to receive(:fresh?).with(entry, now: clock.call).and_return(true)
     allow(RubyWeather::Forecast).to receive(:from_api).and_return(forecast)
     allow(renderer).to receive(:render).and_return("forecast\n")
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(stdout.string).to eq("forecast\n")
     expect(resolver).not_to have_received(:call)
   end
@@ -1250,7 +1250,7 @@ RSpec.describe RubyWeather::CLI do
     allow(RubyWeather::Forecast).to receive(:from_api).and_return(forecast)
     allow(renderer).to receive(:render).and_return("forecast\n")
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(client).to have_received(:call).with(location)
     expect(cache).to have_received(:write)
   end
@@ -1268,7 +1268,7 @@ it "warns with age and succeeds when refresh fails with usable stale data" do
   allow(RubyWeather::Forecast).to receive(:from_api).and_return(forecast)
   allow(renderer).to receive(:render).and_return("stale\n")
 
-  expect(cli.call(["08106"])).to eq(0)
+  expect(cli.call(["90210"])).to eq(0)
   expect(stdout.string).to eq("stale\n")
   expect(stderr.string).to match(/WARNING:.*1 minute ago/)
 end
@@ -1292,7 +1292,7 @@ it "accepts another process's fresh post-lock entry without fetching" do
   allow(RubyWeather::Forecast).to receive(:from_api).and_return(forecast)
   allow(renderer).to receive(:render).and_return("forecast\n")
 
-  expect(cli.call(["08106"])).to eq(0)
+  expect(cli.call(["90210"])).to eq(0)
   expect(client).not_to have_received(:call)
 end
 
@@ -1305,7 +1305,7 @@ it "forces a fetch despite fresh pre-lock and post-lock entries" do
   allow(RubyWeather::Forecast).to receive(:from_api).and_return(forecast)
   allow(renderer).to receive(:render).and_return("forecast\n")
 
-  expect(cli.call(["08106", "--force-fetch"])).to eq(0)
+  expect(cli.call(["90210", "--force-fetch"])).to eq(0)
   expect(client).to have_received(:call).with(location)
 end
 
@@ -1314,7 +1314,7 @@ it "fails without rendering when cache rebuild has no stale candidate" do
   allow(cache).to receive(:with_lock).and_yield
   allow(resolver).to receive(:call).and_raise(RubyWeather::ProviderError, "offline")
 
-  expect(cli.call(["08106"])).to eq(1)
+  expect(cli.call(["90210"])).to eq(1)
   expect(renderer).not_to have_received(:render)
   expect(stderr.string).to include("offline")
 end
@@ -1328,14 +1328,14 @@ it "passes provider and cache details only in verbose mode" do
   allow(location).to receive_messages(latitude: 39.89, longitude: -75.07)
   allow(renderer).to receive(:render).and_return("forecast\n")
 
-  cli.call(["08106", "--verbose"])
+  cli.call(["90210", "--verbose"])
   expect(renderer).to have_received(:render) do |arguments|
     expect(arguments.fetch(:metadata)).to include(
       "39.89", "-75.07", "api.open-meteo.com", "2026-07-28", "1 minute ago"
     )
   end
 
-  cli.call(["08106"])
+  cli.call(["90210"])
   expect(renderer).to have_received(:render).with(hash_including(metadata: nil))
 end
 ```
@@ -1494,8 +1494,8 @@ RSpec.describe "rw integration" do
   it "resolves, fetches, renders, then reuses the disk cache" do
     Dir.mktmpdir do |cache_root|
       transport = FixtureTransport.new(
-        geocoding: fixture("geocoding/08106.json"),
-        forecast: fixture("forecast/08106.json")
+        geocoding: fixture("geocoding/90210.json"),
+        forecast: fixture("forecast/90210.json")
       )
       stdout = StringIO.new
       stderr = StringIO.new
@@ -1504,7 +1504,7 @@ RSpec.describe "rw integration" do
         clock: -> { Time.utc(2026, 7, 28, 23, 24) }
       )
 
-      expect(cli.call(["08106", "--hours", "1", "--days", "1"])).to eq(0)
+      expect(cli.call(["90210", "--hours", "1", "--days", "1"])).to eq(0)
       expect(stdout.string).to include(
         "Audubon, New Jersey, United States",
         "Humidity",
@@ -1518,7 +1518,7 @@ RSpec.describe "rw integration" do
 
       stdout.truncate(0)
       stdout.rewind
-      expect(cli.call(["08106", "--hours", "1", "--days", "1"])).to eq(0)
+      expect(cli.call(["90210", "--hours", "1", "--days", "1"])).to eq(0)
       expect(transport.requests.length).to eq(2)
     end
   end
@@ -1564,9 +1564,9 @@ Document these exact examples:
 
 ```sh
 bundle install
-bundle exec exe/rw 08106
+bundle exec exe/rw 90210
 bundle exec exe/rw "Springfield, IL" --hours 12 --days 7
-bundle exec exe/rw 08106 --verbose --force-fetch
+bundle exec exe/rw 90210 --verbose --force-fetch
 ```
 
 Explain:
@@ -1620,7 +1620,7 @@ Expected:
 This step requires network access and must not run in the deterministic suite:
 
 ```sh
-bundle exec ruby -Ilib exe/rw 08106 --hours 2 --days 2 --verbose --force-fetch
+bundle exec ruby -Ilib exe/rw 90210 --hours 2 --days 2 --verbose --force-fetch
 ```
 
 Expected:

@@ -21,13 +21,13 @@ provider, a disk cache, and no persistent process.
 During development, invoke the repository-local executable with:
 
 ```sh
-bundle exec exe/rw 08106
+bundle exec exe/rw 90210
 ```
 
 Once installed as a gem, invoke it with:
 
 ```sh
-rw 08106
+rw 90210
 ```
 
 The full interface is:

@@ -26,8 +26,8 @@ RSpec.describe "rw integration" do
   it "resolves, fetches, renders, then reuses the disk cache" do
     Dir.mktmpdir do |cache_root|
       transport = IntegrationSupport::FixtureTransport.new(
-        geocoding: fixture("geocoding/08106.json"),
-        forecast: fixture("forecast/08106.json")
+        geocoding: fixture("geocoding/90210.json"),
+        forecast: fixture("forecast/90210.json")
       )
       stdout = StringIO.new
       stderr = StringIO.new
@@ -39,7 +39,7 @@ RSpec.describe "rw integration" do
         clock: -> { Time.utc(2026, 7, 28, 23, 24) }
       )
 
-      expect(cli.call(["08106", "--hours", "1", "--days", "1"])).to eq(0)
+      expect(cli.call(["90210", "--hours", "1", "--days", "1"])).to eq(0)
       expect(stdout.string).to include(
         "Audubon, New Jersey, United States",
         "Humidity",
@@ -53,7 +53,7 @@ RSpec.describe "rw integration" do
 
       stdout.truncate(0)
       stdout.rewind
-      expect(cli.call(["08106", "--hours", "1", "--days", "1"])).to eq(0)
+      expect(cli.call(["90210", "--hours", "1", "--days", "1"])).to eq(0)
       expect(transport.requests.length).to eq(2)
     end
   end

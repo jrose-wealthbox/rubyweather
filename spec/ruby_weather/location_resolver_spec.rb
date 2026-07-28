@@ -6,16 +6,16 @@ RSpec.describe "RubyWeather::LocationResolver" do
   subject(:resolver) { resolver_class.new(transport:) }
 
   it "selects the first geocoding result and preserves the query" do
-    allow(transport).to receive(:get).and_return(fixture("geocoding/08106.json"))
+    allow(transport).to receive(:get).and_return(fixture("geocoding/90210.json"))
 
-    location = resolver.call("08106")
+    location = resolver.call("90210")
 
     expect(location.display_name).to eq("Audubon, New Jersey, United States")
-    expect(location.query).to eq("08106")
+    expect(location.query).to eq("90210")
     expect(location.timezone).to eq("America/New_York")
     expect(transport).to have_received(:get) do |uri|
       expect(uri.host).to eq("geocoding-api.open-meteo.com")
-      expect(uri.query).to include("name=08106", "count=10")
+      expect(uri.query).to include("name=90210", "count=10")
     end
   end
 

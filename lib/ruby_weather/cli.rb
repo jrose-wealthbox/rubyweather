@@ -35,8 +35,8 @@ module RubyWeather
       end
       remaining = parser.parse(argv.dup)
       raise UsageError, parser.banner unless remaining.length == 1
-      raise UsageError, "hours must be between 1 and 384" unless (1..384).cover?(values[:hours])
-      raise UsageError, "days must be between 1 and 16" unless (1..16).cover?(values[:days])
+      raise UsageError, "hours must be between 1 and 10" unless (1..10).cover?(values[:hours])
+      raise UsageError, "days must be between 1 and 10" unless (1..10).cover?(values[:days])
 
       Options.new(location: remaining.first, **values)
     rescue OptionParser::ParseError => error

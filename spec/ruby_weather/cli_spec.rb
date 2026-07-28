@@ -12,7 +12,7 @@ RSpec.describe RubyWeather::CLI do
   let(:renderer) { instance_double(RubyWeather::Renderer) }
   let(:location) do
     RubyWeather::Location.new(
-      query: "08106",
+      query: "90210",
       name: "Audubon",
       admin1: "New Jersey",
       country: "United States",
@@ -22,7 +22,7 @@ RSpec.describe RubyWeather::CLI do
       timezone: "America/New_York"
     )
   end
-  let(:payload) { JSON.parse(fixture("forecast/08106.json")) }
+  let(:payload) { JSON.parse(fixture("forecast/90210.json")) }
   let(:entry) do
     RubyWeather::CacheStore::Entry.new(
       location:,
@@ -50,10 +50,10 @@ RSpec.describe RubyWeather::CLI do
   end
 
   it "renders a fresh cache entry without network access" do
-    allow(cache).to receive(:read).with("08106").and_return(entry)
+    allow(cache).to receive(:read).with("90210").and_return(entry)
     allow(cache).to receive(:fresh?).with(entry, now:).and_return(true)
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(stdout.string).to eq("forecast\n")
     expect(resolver).not_to have_received(:call)
     expect(client).not_to have_received(:call)
@@ -63,12 +63,12 @@ RSpec.describe RubyWeather::CLI do
     allow(cache).to receive(:read).and_return(nil, nil)
     allow(cache).to receive(:with_lock).and_yield
     allow(cache).to receive(:write)
-    allow(resolver).to receive(:call).with("08106").and_return(location)
+    allow(resolver).to receive(:call).with("90210").and_return(location)
     allow(client).to receive(:call).with(location).and_return(payload)
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(cache).to have_received(:write) do |query, written|
-      expect(query).to eq("08106")
+      expect(query).to eq("90210")
       expect(written.location).to eq(location)
       expect(written.forecast_payload).to eq(payload)
     end
@@ -82,7 +82,7 @@ RSpec.describe RubyWeather::CLI do
     allow(cache).to receive(:fresh?).with(fresh, now:).and_return(true)
     allow(cache).to receive(:with_lock).and_yield
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(client).not_to have_received(:call)
   end
 
@@ -92,7 +92,7 @@ RSpec.describe RubyWeather::CLI do
     allow(cache).to receive(:write)
     allow(client).to receive(:call).with(location).and_return(payload)
 
-    expect(cli.call(["08106", "--force-fetch"])).to eq(0)
+    expect(cli.call(["90210", "--force-fetch"])).to eq(0)
     expect(client).to have_received(:call).with(location)
   end
 
@@ -106,7 +106,7 @@ RSpec.describe RubyWeather::CLI do
       "offline"
     )
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(stdout.string).to eq("forecast\n")
     expect(stderr.string).to match(/WARNING:.*2 hours ago/)
   end
@@ -114,12 +114,12 @@ RSpec.describe RubyWeather::CLI do
   it "fails without rendering when rebuild has no stale candidate" do
     allow(cache).to receive(:read).and_return(nil, nil)
     allow(cache).to receive(:with_lock).and_yield
-    allow(resolver).to receive(:call).with("08106").and_raise(
+    allow(resolver).to receive(:call).with("90210").and_raise(
       RubyWeather::ProviderError,
       "offline"
     )
 
-    expect(cli.call(["08106"])).to eq(1)
+    expect(cli.call(["90210"])).to eq(1)
     expect(renderer).not_to have_received(:render)
     expect(stderr.string).to include("offline")
   end
@@ -129,10 +129,10 @@ RSpec.describe RubyWeather::CLI do
     allow(cache).to receive(:read).and_return(broken, broken)
     allow(cache).to receive(:with_lock).and_yield
     allow(cache).to receive(:write)
-    allow(resolver).to receive(:call).with("08106").and_return(location)
+    allow(resolver).to receive(:call).with("90210").and_return(location)
     allow(client).to receive(:call).with(location).and_return(payload)
 
-    expect(cli.call(["08106"])).to eq(0)
+    expect(cli.call(["90210"])).to eq(0)
     expect(client).to have_received(:call).with(location)
   end
 
@@ -140,7 +140,7 @@ RSpec.describe RubyWeather::CLI do
     allow(cache).to receive(:read).and_return(entry)
     allow(cache).to receive(:fresh?).and_return(true)
 
-    cli.call(["08106", "--verbose"])
+    cli.call(["90210", "--verbose"])
     expect(renderer).to have_received(:render) do |arguments|
       expect(arguments.fetch(:metadata)).to include(
         "39.89",
@@ -151,7 +151,7 @@ RSpec.describe RubyWeather::CLI do
       )
     end
 
-    cli.call(["08106"])
+    cli.call(["90210"])
     expect(renderer).to have_received(:render).with(hash_including(metadata: nil))
   end
 

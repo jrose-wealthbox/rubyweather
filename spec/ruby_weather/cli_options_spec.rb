@@ -5,10 +5,10 @@ RSpec.describe "RubyWeather::CLI" do
 
   describe ".parse" do
     it "uses the five-hour and five-day defaults" do
-      options = cli_class.parse(["08106"])
+      options = cli_class.parse(["90210"])
 
       expect(options.to_h).to eq(
-        location: "08106",
+        location: "90210",
         hours: 5,
         days: 5,
         verbose: false,
@@ -18,12 +18,12 @@ RSpec.describe "RubyWeather::CLI" do
 
     it "accepts independent hour and day counts and switches" do
       options = cli_class.parse(
-        ["Springfield, IL", "--hours", "12", "--days", "7", "--verbose", "--force-fetch"]
+        ["Springfield, IL", "--hours", "10", "--days", "7", "--verbose", "--force-fetch"]
       )
 
       expect(options.to_h).to include(
         location: "Springfield, IL",
-        hours: 12,
+        hours: 10,
         days: 7,
         verbose: true,
         force_fetch: true
@@ -32,10 +32,10 @@ RSpec.describe "RubyWeather::CLI" do
 
     it "rejects missing locations, zero counts, and provider-overflow counts" do
       expect { cli_class.parse([]) }.to raise_error(RubyWeather::UsageError)
-      expect { cli_class.parse(["08106", "--hours", "0"]) }
-        .to raise_error(RubyWeather::UsageError, /hours must be between 1 and 384/)
-      expect { cli_class.parse(["08106", "--days", "17"]) }
-        .to raise_error(RubyWeather::UsageError, /days must be between 1 and 16/)
+      expect { cli_class.parse(["90210", "--hours", "0"]) }
+        .to raise_error(RubyWeather::UsageError, /hours must be between 1 and #{RubyWeather::Constants::MAX_HOURS}/)
+      expect { cli_class.parse(["90210", "--days", "999"]) }
+        .to raise_error(RubyWeather::UsageError, /days must be between 1 and #{RubyWeather::Constants::MAX_DAYS}/)
     end
 
     it "raises a successful help signal containing usage" do
