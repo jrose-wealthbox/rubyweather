@@ -96,6 +96,7 @@ Requested hourly fields:
 - `dew_point_2m`
 - `precipitation_probability`
 - `weather_code`
+- `is_day`
 
 Requested daily fields:
 
@@ -130,6 +131,7 @@ An hourly record contains:
 - Dew point
 - Precipitation probability
 - WMO weather code
+- Day/night indicator
 
 A daily record contains:
 
@@ -364,6 +366,7 @@ Required coverage:
 - Exact 1:00 PM humidity and dew-point selection
 - Daily maximum precipitation probability
 - Weather-code and precipitation-indicator mapping
+- Day/night clear-sky icon selection
 - Fresh cache hits with zero network calls
 - Concurrent refresh serialization and the post-lock freshness recheck
 - Expired and forced refreshes
