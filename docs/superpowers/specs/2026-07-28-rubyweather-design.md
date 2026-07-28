@@ -88,6 +88,8 @@ The forecast request uses:
 - Fahrenheit temperature units
 - Full supported hourly and daily coverage, independent of the requested
   display counts
+- The preceding 24 hourly records, ensuring today's 1:00 PM moisture sample is
+  available even when the command runs later in the day
 
 Requested hourly fields:
 
