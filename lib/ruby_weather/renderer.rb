@@ -19,7 +19,7 @@ module RubyWeather
 
     def hourly_table(hours)
       table(
-        ["", *hours.map { |hour| hour.time.strftime("%-I%p") }],
+        ["", *hours.map { |hour| centered_heading(hour.time.strftime("%-I%p")) }],
         [
           ["Temp", *hours.map { |hour| temperature_cell(hour) }],
           ["Humidity", *hours.map { |hour| humidity_cell(hour) }],
@@ -30,7 +30,7 @@ module RubyWeather
 
     def daily_table(days)
       table(
-        ["", *days.map { |day| day.date.strftime("%a") }],
+        ["", *days.map { |day| centered_heading(day.date.strftime("%a")) }],
         [
           ["Temp", *days.map { |day| temperature_range_cell(day) }],
           ["Humidity", *days.map { |day| humidity_cell(day) }],
@@ -49,6 +49,10 @@ module RubyWeather
         }
         (1...headings.length).each { |column| table.align_column(column, :right) }
       end.to_s
+    end
+
+    def centered_heading(value)
+      { value:, alignment: :center }
     end
 
     def temperature_cell(hour)

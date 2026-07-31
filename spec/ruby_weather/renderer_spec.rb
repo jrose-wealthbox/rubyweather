@@ -54,6 +54,19 @@ RSpec.describe "RubyWeather::Renderer" do
     )
   end
 
+  it "centers the hour and day headings within their columns" do
+    output = renderer_class.new.render(
+      location:,
+      forecast:,
+      hours: 1,
+      days: 1,
+      metadata: nil
+    )
+
+    expect(output).to include("          |    7PM\n")
+    expect(output).to include("          |    Tue\n")
+  end
+
   it "includes metadata only when supplied" do
     output = renderer_class.new.render(
       location:,
