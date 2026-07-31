@@ -35,8 +35,10 @@ module RubyWeather
       end
       remaining = parser.parse(argv.dup)
       raise UsageError, parser.banner unless remaining.length == 1
-      raise UsageError, "hours must be between 1 and 10" unless (1..10).cover?(values[:hours])
-      raise UsageError, "days must be between 1 and 10" unless (1..10).cover?(values[:days])
+      raise UsageError, "hours must be between 1 and #{Constants::MAX_HOURS}" unless
+        (1..Constants::MAX_HOURS).cover?(values[:hours])
+      raise UsageError, "days must be between 1 and #{Constants::MAX_DAYS}" unless
+        (1..Constants::MAX_DAYS).cover?(values[:days])
 
       Options.new(location: remaining.first, **values)
     rescue OptionParser::ParseError => error
@@ -96,10 +98,9 @@ module RubyWeather
     def refresh_locked(options, entry, forecast)
       @cache.with_lock(options.location) do
         unless options.force_fetch
-          entry, forecast = readable_entry(options.location, now: @clock.call)
-          if entry && @cache.fresh?(entry, now: @clock.call)
-            return render(options, entry, forecast, now: @clock.call)
-          end
+          now = @clock.call
+          entry, forecast = readable_entry(options.location, now:)
+          return render(options, entry, forecast, now:) if entry && @cache.fresh?(entry, now:)
         end
 
         refresh(options, entry, forecast)
@@ -117,8 +118,9 @@ module RubyWeather
     rescue Error => error
       raise unless stale_entry && stale_forecast
 
-      warn_stale(error, stale_entry, now: @clock.call)
-      render(options, stale_entry, stale_forecast, now: @clock.call)
+      now = @clock.call
+      warn_stale(error, stale_entry, now:)
+      render(options, stale_entry, stale_forecast, now:)
     end
 
     def readable_entry(location, now:)

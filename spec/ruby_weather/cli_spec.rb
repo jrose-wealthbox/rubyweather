@@ -77,6 +77,7 @@ RSpec.describe RubyWeather::CLI do
   it "accepts another process's fresh post-lock entry without fetching" do
     stale = entry.with(fetched_at: now - 3_600)
     fresh = entry.with(fetched_at: now - 30)
+    allow(clock).to receive(:call).and_return(now)
     allow(cache).to receive(:read).and_return(stale, fresh)
     allow(cache).to receive(:fresh?).with(stale, now:).and_return(false)
     allow(cache).to receive(:fresh?).with(fresh, now:).and_return(true)
@@ -84,6 +85,7 @@ RSpec.describe RubyWeather::CLI do
 
     expect(cli.call(["90210"])).to eq(0)
     expect(client).not_to have_received(:call)
+    expect(clock).to have_received(:call).twice
   end
 
   it "forces a fetch despite a fresh cache entry" do
@@ -98,6 +100,7 @@ RSpec.describe RubyWeather::CLI do
 
   it "warns with age and succeeds when refresh fails with usable stale data" do
     stale = entry.with(fetched_at: now - 7_200)
+    allow(clock).to receive(:call).and_return(now)
     allow(cache).to receive(:read).and_return(stale, stale)
     allow(cache).to receive(:fresh?).with(stale, now:).and_return(false)
     allow(cache).to receive(:with_lock).and_yield
@@ -109,6 +112,7 @@ RSpec.describe RubyWeather::CLI do
     expect(cli.call(["90210"])).to eq(0)
     expect(stdout.string).to eq("forecast\n")
     expect(stderr.string).to match(/WARNING:.*2 hours ago/)
+    expect(clock).to have_received(:call).exactly(3).times
   end
 
   it "fails without rendering when rebuild has no stale candidate" do

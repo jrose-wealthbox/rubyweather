@@ -30,6 +30,20 @@ RSpec.describe "RubyWeather::CLI" do
       )
     end
 
+    it "validates hours against the shared maximum" do
+      stub_const("RubyWeather::Constants::MAX_HOURS", 1)
+
+      expect { cli_class.parse(["90210", "--hours", "2"]) }
+        .to raise_error(RubyWeather::UsageError, /hours must be between 1 and 1/)
+    end
+
+    it "validates days against the shared maximum" do
+      stub_const("RubyWeather::Constants::MAX_DAYS", 1)
+
+      expect { cli_class.parse(["90210", "--days", "2"]) }
+        .to raise_error(RubyWeather::UsageError, /days must be between 1 and 1/)
+    end
+
     it "rejects missing locations, zero counts, and provider-overflow counts" do
       expect { cli_class.parse([]) }.to raise_error(RubyWeather::UsageError)
       expect { cli_class.parse(["90210", "--hours", "0"]) }
